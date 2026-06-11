@@ -1,10 +1,10 @@
-# 🌿 Fractal Tree
+# Fractal Tree
 
 An interactive generative art piece built with [p5.js](https://p5js.org/).
 
 A recursive tree that responds to your mouse and breathes with a slow wind animation. No two moments look quite the same.
 
-## ✨ Controls
+## Controls
 
 | Input | Effect |
 |-------|--------|
@@ -14,13 +14,13 @@ A recursive tree that responds to your mouse and breathes with a slow wind anima
 
 ## 🚀 Running it
 
-No build step, no dependencies to install — just open `index.html` in a browser.
+Open `index.html` in a browser.
 
 ```bash
-# Option 1 — just open the file
+# Option 1: just open the file
 open index.html
 
-# Option 2 — serve locally (recommended for live-reload)
+# Option 2: serve locally (recommended for live-reload)
 npx serve .
 # or
 python3 -m http.server 8080
@@ -52,4 +52,3 @@ fractal-tree/
 
 Inspired by [Dan Shiffman's Recursive Tree](https://processing.org/examples/tree.html) and the [p5.js Recursive Tree example](https://p5js.org/examples/repetition-recursive-tree/). This version adds wind animation, dual palettes, mouse-Y length control, and a fuller canopy via mid-branches.
 
-Feel free to fork, remix, and grow your own.
