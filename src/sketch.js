@@ -1,14 +1,12 @@
 /**
  * Fractal Tree — interactive generative art
  *
- * Mouse X  → controls branching angle
- * Mouse Y  → controls branch length decay
+ * Mouse X  → branching angle
+ * Mouse Y  → branch length decay
  * Click    → toggle day / night palette
- *
- * Built with p5.js
  */
 
-let palette = "night"; // "night" | "day"
+let palette = "night";
 let windAngle = 0;
 let windTarget = 0;
 
@@ -19,103 +17,62 @@ function setup() {
 }
 
 function draw() {
-  // Soft sky gradient background
   drawBackground();
 
-  // Gentle wind sway (independent of mouse)
-  windTarget = sin(frameCount * 0.5) * 4;
+  windTarget = sin(frameCount * 0.5) * 3;
   windAngle = lerp(windAngle, windTarget, 0.05);
 
-  // Map mouse to controls
-  const branchAngle = map(mouseX, 0, width, 10, 45);
-  const lengthDecay = map(mouseY, 0, height, 0.85, 0.6);
+  const branchAngle = map(mouseX, 0, width, 12, 40);
+  const lengthDecay = map(mouseY, 0, height, 0.78, 0.62);
 
   translate(width / 2, height);
 
-  // Draw ground shadow
-  drawTrunk(branchAngle, lengthDecay);
+  // Trunk
+  const trunkLen = height * 0.18;
+  strokeWeight(10);
+  stroke(25, 50, 35);
+  line(0, 0, 0, -trunkLen);
+  translate(0, -trunkLen);
+
+  branch(trunkLen, branchAngle, lengthDecay, 0, 11);
 }
 
 function drawBackground() {
-  if (palette === "night") {
-    // Deep blue-black gradient
-    for (let y = 0; y < height; y++) {
-      const t = y / height;
-      const h = lerp(240, 260, t);
-      const b = lerp(10, 4, t);
-      stroke(h, 60, b);
-      line(0, y, width, y);
-    }
-  } else {
-    // Warm sky gradient
-    for (let y = 0; y < height; y++) {
-      const t = y / height;
-      const h = lerp(200, 180, t);
-      const s = lerp(40, 20, t);
-      const b = lerp(95, 85, t);
-      stroke(h, s, b);
-      line(0, y, width, y);
-    }
-  }
+  background(palette === "night" ? color(240, 40, 6) : color(195, 25, 96));
 }
 
-function drawTrunk(angle, decay) {
-  const trunkLen = height * 0.22;
-  strokeWeight(12);
-  const trunkHue = palette === "night" ? 30 : 25;
-  stroke(trunkHue, 55, 45);
-  line(0, 0, 0, -trunkLen);
-  translate(0, -trunkLen);
-  branch(trunkLen, angle, decay, 0, 12);
-}
+// Rainbow hues per level — vivid and spread out
+const HUES = [28, 55, 90, 140, 175, 200, 240, 280, 320, 0, 45];
 
-/**
- * Recursive branch function
- * @param {number} len      current branch length
- * @param {number} angle    branching angle (from mouse)
- * @param {number} decay    length decay per level (from mouse)
- * @param {number} level    current recursion depth
- * @param {number} maxDepth stop recursing below this
- */
 function branch(len, angle, decay, level, maxDepth) {
-  if (len < 4 || level >= maxDepth) return;
+  if (len < 5 || level >= maxDepth) return;
 
   const nextLen = len * decay;
-  const w = map(len, 4, height * 0.22, 1, 10);
+  const w = map(level, 0, maxDepth, 8, 0.8);
   strokeWeight(w);
 
-  // Hue shifts from warm brown → cool green → vivid tips
-  const hue = map(level, 0, maxDepth, palette === "night" ? 30 : 25, palette === "night" ? 150 : 120);
-  const sat = map(level, 0, maxDepth, 50, 80);
-  const bri = map(level, 0, maxDepth, 40, 90);
-  const alpha = map(level, 0, maxDepth, 100, 75);
-  stroke(hue, sat, bri, alpha);
+  const hue = HUES[level % HUES.length];
+  const sat = 85;
+  const bri = map(level, 0, maxDepth, 70, 100);
+  stroke(hue, sat, bri, 95);
 
-  // Right branch
+  const wind = windAngle * (level * 0.25);
+
+  // Right
   push();
-  rotate(angle + windAngle * (level * 0.3));
+  rotate(angle + wind);
   line(0, 0, 0, -nextLen);
   translate(0, -nextLen);
   branch(nextLen, angle, decay, level + 1, maxDepth);
   pop();
 
-  // Left branch
+  // Left
   push();
-  rotate(-angle + windAngle * (level * 0.3));
+  rotate(-angle + wind);
   line(0, 0, 0, -nextLen);
   translate(0, -nextLen);
   branch(nextLen, angle, decay, level + 1, maxDepth);
   pop();
-
-  // Optional middle branch on early levels for fuller canopy
-  if (level < 4) {
-    push();
-    rotate(windAngle * (level * 0.15));
-    line(0, 0, 0, -nextLen * 0.9);
-    translate(0, -nextLen * 0.9);
-    branch(nextLen * 0.9, angle, decay, level + 2, maxDepth);
-    pop();
-  }
 }
 
 function mousePressed() {
